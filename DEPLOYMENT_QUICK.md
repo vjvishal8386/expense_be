@@ -96,7 +96,7 @@ git push -u origin main
    ```
    
    ```
-   ACCESS_TOKEN_EXPIRE_MINUTES = 10080
+    = 10080
    ```
 
 3. **Click "Save Changes"**
