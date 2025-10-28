@@ -1,0 +1,155 @@
+Expense Tracker Backend - File Structure
+=========================================
+
+temp_BE/
+│
+├── 📄 Configuration Files
+│   ├── requirements.txt          # Python dependencies
+│   ├── .env.example              # Environment variables template
+│   ├── .gitignore                # Git ignore patterns
+│   ├── alembic.ini               # Alembic migration config
+│   │
+├── 📚 Documentation
+│   ├── README.md                 # Comprehensive documentation (248 lines)
+│   ├── QUICKSTART.md             # 5-minute setup guide
+│   ├── PROJECT_SUMMARY.md        # Complete project overview
+│   ├── API_EXAMPLES.md           # API usage examples
+│   └── STRUCTURE.txt             # This file
+│
+├── 🔧 Helper Scripts
+│   ├── setup.sh                  # Automated setup script
+│   ├── run_server.sh             # Start the server
+│   ├── migrate.sh                # Run database migrations
+│   └── test_api.py               # API testing script
+│
+├── 🗄️ Database Migrations (alembic/)
+│   ├── env.py                    # Migration environment
+│   ├── script.py.mako            # Migration template
+│   ├── README                    # Alembic info
+│   └── versions/                 # Migration versions
+│       └── .gitkeep
+│
+└── 🚀 Application (app/)
+    ├── main.py                   # FastAPI app initialization, CORS
+    ├── database.py               # Database connection & session
+    ├── security.py               # JWT & password hashing
+    ├── dependencies.py           # Dependency injection
+    │
+    ├── 📦 Models (models/)
+    │   ├── __init__.py
+    │   ├── user.py               # User table model
+    │   ├── friend.py             # Friend relationship model
+    │   └── expense.py            # Expense table model
+    │
+    ├── 📋 Schemas (schemas/)
+    │   ├── __init__.py
+    │   ├── auth.py               # Auth request/response schemas
+    │   ├── friend.py             # Friend schemas
+    │   └── expense.py            # Expense schemas
+    │
+    └── 🛣️ Routers (routers/)
+        ├── __init__.py
+        ├── auth.py               # /auth/* endpoints
+        ├── friends.py            # /friends/* endpoints
+        └── expenses.py           # /expenses/* endpoints
+
+
+API Endpoints
+=============
+
+Authentication (/auth)
+├── POST   /auth/register         Create new user
+├── POST   /auth/login            Authenticate user
+└── GET    /auth/me               Get current user
+
+Friends (/friends)
+├── GET    /friends                List all friends
+└── POST   /friends                Add a friend
+
+Expenses (/expenses)
+├── GET    /expenses/{friend_id}           Get expenses with friend
+├── POST   /expenses                       Create new expense
+└── GET    /expenses/{friend_id}/balance   Get balance
+
+Utility
+├── GET    /                      API info
+├── GET    /health                Health check
+├── GET    /docs                  Swagger UI
+└── GET    /redoc                 ReDoc
+
+
+Database Schema
+===============
+
+Users Table
+├── id (UUID, PK)
+├── email (unique, indexed)
+├── password_hash
+├── name (optional)
+└── created_at
+
+Friends Table
+├── id (UUID, PK)
+├── user_id (FK → users.id, indexed)
+├── friend_id (FK → users.id, indexed)
+├── created_at
+└── UNIQUE(user_id, friend_id)
+
+Expenses Table
+├── id (UUID, PK)
+├── user_a_id (FK → users.id, indexed)
+├── user_b_id (FK → users.id, indexed)
+├── amount (decimal)
+├── description
+├── paid_by_user_id (FK → users.id, indexed)
+├── expense_date
+├── created_at
+├── updated_at
+└── CHECK(paid_by_user_id IN (user_a_id, user_b_id))
+
+
+Key Features
+============
+
+✓ JWT-based authentication (7-day expiration)
+✓ Bcrypt password hashing
+✓ Bidirectional friend relationships
+✓ Shared expense tracking
+✓ Real-time balance calculation
+✓ CORS enabled for frontend
+✓ PostgreSQL with SQLAlchemy ORM
+✓ Pydantic validation
+✓ Database migrations with Alembic
+✓ Comprehensive documentation
+✓ Automated setup scripts
+✓ API testing capabilities
+✓ Production-ready error handling
+
+
+Quick Start
+===========
+
+1. ./setup.sh                     # Setup environment
+2. Edit .env file                 # Configure database
+3. createdb expense_tracker       # Create database
+4. ./migrate.sh                   # Run migrations
+5. ./run_server.sh                # Start server
+6. Visit http://127.0.0.1:8000/docs
+
+
+Technology Stack
+================
+
+• Framework: FastAPI 0.104.1
+• Server: Uvicorn with hot reload
+• Database: PostgreSQL
+• ORM: SQLAlchemy 2.0.23
+• Migrations: Alembic 1.12.1
+• Auth: JWT (python-jose) + Bcrypt (passlib)
+• Validation: Pydantic 2.5.0
+• Environment: python-dotenv
+
+
+Total Files: 30+
+Total Lines: ~2000+
+Status: ✅ Production Ready
