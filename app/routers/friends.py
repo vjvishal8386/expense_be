@@ -7,7 +7,7 @@ from app.models.user import User
 from app.models.friend import Friend
 from app.schemas.friend import FriendAdd, FriendResponse, FriendInviteRequest, FriendInviteResponse
 from app.dependencies import get_current_user
-from app.services.email_service import email_service
+from app.services.sendgrid_email_service import email_service
 from app.services.invitation_service import invitation_service
 
 router = APIRouter(prefix="/friends", tags=["Friends"])

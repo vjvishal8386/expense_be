@@ -11,7 +11,7 @@ from app.schemas.auth import (
 )
 from app.security import verify_password, get_password_hash, create_access_token
 from app.dependencies import get_current_user
-from app.services.email_service import email_service
+from app.services.sendgrid_email_service import email_service
 from app.services.otp_service import otp_service
 from app.services.invitation_service import invitation_service
 
