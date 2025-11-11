@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, and_
 from typing import List
 from uuid import UUID
 from decimal import Decimal
+from datetime import datetime
 
 from app.database import get_db
 from app.models.user import User
@@ -11,6 +13,7 @@ from app.models.friend import Friend
 from app.models.expense import Expense
 from app.schemas.expense import ExpenseCreate, ExpenseResponse, BalanceResponse
 from app.dependencies import get_current_user
+from app.services.pdf_service import pdf_service
 
 router = APIRouter(prefix="/expenses", tags=["Expenses"])
 
@@ -134,4 +137,96 @@ def get_balance_with_friend(
             balance -= expense.amount
     
     return BalanceResponse(balance=float(balance))
+
+
+@router.get(
+    "/{friend_id}/pdf",
+    summary="Download expense report as PDF",
+    description="""
+    Generate and download a PDF report of all expenses with a friend.
+    
+    **PDF Includes:**
+    - Report generation date and time
+    - Balance summary (who owes whom)
+    - Detailed expense list with dates, descriptions, amounts
+    - Total expenses amount
+    - Professional formatting
+    
+    **Response:**
+    - Returns PDF file
+    - Filename: expense-report-{friend_id}-{date}.pdf
+    - Content-Type: application/pdf
+    """
+)
+def download_expense_pdf(
+    friend_id: UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Download expense report as PDF
+    """
+    # Verify friend relationship exists
+    friendship = db.query(Friend).filter(
+        Friend.user_id == current_user.id,
+        Friend.friend_id == friend_id
+    ).first()
+    
+    if not friendship:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Friend not found"
+        )
+    
+    # Get friend user details
+    friend_user = db.query(User).filter(User.id == friend_id).first()
+    if not friend_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Friend user not found"
+        )
+    
+    # Get all expenses between current user and friend
+    expenses = db.query(Expense).filter(
+        or_(
+            and_(Expense.user_a_id == current_user.id, Expense.user_b_id == friend_id),
+            and_(Expense.user_a_id == friend_id, Expense.user_b_id == current_user.id)
+        )
+    ).order_by(Expense.expense_date.desc(), Expense.created_at.desc()).all()
+    
+    # Calculate balance
+    balance = Decimal(0)
+    for expense in expenses:
+        if expense.paid_by_user_id == current_user.id:
+            balance += expense.amount
+        else:
+            balance -= expense.amount
+    
+    # Convert expenses to dictionary format for PDF service
+    expenses_data = []
+    for expense in expenses:
+        expense_dict = ExpenseResponse.from_orm_expense(expense).model_dump()
+        expenses_data.append(expense_dict)
+    
+    # Generate PDF
+    pdf_buffer = pdf_service.generate_expense_report(
+        expenses=expenses_data,
+        current_user_name=current_user.name or current_user.email,
+        friend_name=friend_user.name or friend_user.email,
+        balance=float(balance),
+        currency_symbol="₹"
+    )
+    
+    # Generate filename
+    date_str = datetime.now().strftime("%Y%m%d")
+    filename = f"expense-report-{friend_id}-{date_str}.pdf"
+    
+    # Return PDF as streaming response
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={
+            "Content-Disposition": f'attachment; filename="{filename}"'
+        }
+    )
 
