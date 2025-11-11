@@ -12,7 +12,7 @@ class SendGridEmailService:
     
     def __init__(self):
         self.api_key = os.getenv("SENDGRID_API_KEY")
-        self.from_email = os.getenv("FROM_EMAIL", "noreply@expensetracker.com")
+        self.from_email = os.getenv("FROM_EMAIL", "noreply@spendbook.com")
         self.frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
         
         # Initialize SendGrid client if API key is available
@@ -56,7 +56,7 @@ class SendGridEmailService:
                         <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 20px 0;">
                         <p style="color: #6B7280; font-size: 12px;">
                             Best regards,<br>
-                            Expense Tracker Team
+                            Spend Book Team
                         </p>
                     </div>
                 </body>
@@ -65,7 +65,7 @@ class SendGridEmailService:
             
             # Create email message
             message = Mail(
-                from_email=Email(self.from_email, "Expense Tracker"),
+                from_email=Email(self.from_email, "Spend Book"),
                 to_emails=To(to_email),
                 subject="Email Verification - OTP Code",
                 html_content=Content("text/html", html_content)
@@ -121,7 +121,7 @@ class SendGridEmailService:
                     <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                         <h2 style="color: #4F46E5;">You're Invited!</h2>
                         <p>Hi there!</p>
-                        <p><strong>{inviter_name}</strong> has invited you to join Expense Tracker to manage shared expenses together!</p>
+                        <p><strong>{inviter_name}</strong> has invited you to join Spend Book to manage shared expenses together!</p>
                         <div style="text-align: center; margin: 30px 0;">
                             <a href="{registration_link}" 
                                style="background-color: #4F46E5; color: white; padding: 12px 30px; 
@@ -141,7 +141,7 @@ class SendGridEmailService:
                         <p style="color: #6B7280; font-size: 12px;">
                             If you didn't expect this invitation, you can safely ignore this email.<br><br>
                             Best regards,<br>
-                            Expense Tracker Team
+                            Spend Book Team
                         </p>
                     </div>
                 </body>
@@ -150,9 +150,9 @@ class SendGridEmailService:
             
             # Create email message
             message = Mail(
-                from_email=Email(self.from_email, "Expense Tracker"),
+                from_email=Email(self.from_email, "Spend Book"),
                 to_emails=To(to_email),
-                subject=f"{inviter_name} invited you to join Expense Tracker!",
+                subject=f"{inviter_name} invited you to join Spend Book!",
                 html_content=Content("text/html", html_content)
             )
             
@@ -202,7 +202,7 @@ class SendGridEmailService:
                     <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                         <h2 style="color: #4F46E5;">New Friend Request!</h2>
                         <p>{greeting}</p>
-                        <p>Great news! <strong>{requester_name}</strong> has added you as a friend on Expense Tracker.</p>
+                        <p>Great news! <strong>{requester_name}</strong> has added you as a friend on Spend Book.</p>
                         <p>You can now share and track expenses with {requester_name}.</p>
                         <div style="text-align: center; margin: 30px 0;">
                             <a href="{self.frontend_url}/login" 
@@ -215,7 +215,7 @@ class SendGridEmailService:
                         <hr style="border: none; border-top: 1px solid #E5E7EB; margin: 20px 0;">
                         <p style="color: #6B7280; font-size: 12px;">
                             Best regards,<br>
-                            Expense Tracker Team
+                            Spend Book Team
                         </p>
                     </div>
                 </body>
@@ -224,9 +224,9 @@ class SendGridEmailService:
             
             # Create email message
             message = Mail(
-                from_email=Email(self.from_email, "Expense Tracker"),
+                from_email=Email(self.from_email, "Spend Book"),
                 to_emails=To(to_email),
-                subject=f"{requester_name} added you as a friend on Expense Tracker",
+                subject=f"{requester_name} added you as a friend on Spend Book",
                 html_content=Content("text/html", html_content)
             )
             
