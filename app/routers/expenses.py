@@ -14,6 +14,10 @@ from app.models.expense import Expense
 from app.schemas.expense import ExpenseCreate, ExpenseResponse, BalanceResponse
 from app.dependencies import get_current_user
 from app.services.pdf_service import pdf_service
+from app.services.notification_service import send_expense_notification
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/expenses", tags=["Expenses"])
 
@@ -91,6 +95,26 @@ def create_expense(
     db.add(new_expense)
     db.commit()
     db.refresh(new_expense)
+    
+    # Send push notification to friend (async, don't block response)
+    try:
+        # Get friend user details for notification
+        friend_user = db.query(User).filter(User.id == expense_data.friend_id).first()
+        
+        if friend_user:
+            # Send notification to the friend
+            send_expense_notification(
+                db=db,
+                recipient_user_id=str(expense_data.friend_id),
+                expense_creator_name=current_user.name or current_user.email,
+                expense_amount=float(expense_data.amount),
+                expense_description=expense_data.description,
+                expense_id=str(new_expense.id),
+                friend_id=str(current_user.id)
+            )
+    except Exception as e:
+        # Log error but don't fail the expense creation
+        logger.error(f"Failed to send push notification: {e}")
     
     return ExpenseResponse.from_orm_expense(new_expense)
 

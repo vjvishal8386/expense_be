@@ -4,7 +4,7 @@ import logging
 
 from app.routers import auth, friends, expenses
 from app.database import engine, Base
-
+from app.routers import notifications
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -34,6 +34,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(friends.router)
 app.include_router(expenses.router)
+app.include_router(notifications.router)
 
 
 @app.get("/", tags=["Health"])
