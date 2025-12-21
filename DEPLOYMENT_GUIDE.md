@@ -14,6 +14,11 @@ Complete guide to deploy your Expense Tracker backend for **FREE** with PostgreS
 
 ---
 
+## Note on bcrypt / passlib compatibility
+
+We pin `bcrypt==3.2.2` in `requirements.txt` because some newer `bcrypt` releases changed how version metadata is exposed which caused `passlib.handlers.bcrypt` to fail when trying to read the bcrypt version at runtime. If you upgrade `bcrypt` or `passlib` in future, verify the registration/password hashing flows locally and in CI.
+
+
 ## 🎯 Best Free Options (Comparison)
 
 | Platform | Backend | Database | Auto-Deploy | Sleep Time | Best For |

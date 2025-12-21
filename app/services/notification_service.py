@@ -41,7 +41,7 @@ def initialize_fcm():
             return False
         
         cred = credentials.Certificate(firebase_key_path)
-firebase_admin.initialize_app(cred)
+        firebase_admin.initialize_app(cred)
         _fcm_initialized = True
         logger.info("Firebase Admin SDK initialized successfully")
         return True
@@ -57,8 +57,8 @@ def subscribe_token_to_topic(token: str, topic: str):
         return 0
     
     try:
-    response = messaging.subscribe_to_topic([token], topic)
-    return response.success_count
+        response = messaging.subscribe_to_topic([token], topic)
+        return response.success_count
     except Exception as e:
         logger.error(f"Error subscribing token to topic: {e}")
         return 0
@@ -70,15 +70,15 @@ def send_project_alert(topic: str, title: str, body: str, data: dict = None):
         return None
     
     try:
-    message = messaging.Message(
+        message = messaging.Message(
         notification=messaging.Notification(
             title=title,
             body=body,
         ),
             data=data or {},
         topic=topic,
-    )
-    return messaging.send(message)
+        )
+        return messaging.send(message)
     except Exception as e:
         logger.error(f"Error sending topic notification: {e}")
         return None
